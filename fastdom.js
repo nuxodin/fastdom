@@ -18,7 +18,7 @@
  *
  * @type {Function}
  */
-var raf = win.requestAnimationFrame;
+var raf = requestAnimationFrame;
 
 /**
  * Initialize a `FastDom`.
@@ -148,12 +148,6 @@ function remove(array, item) {
   return !!~index && !!array.splice(index, 1);
 }
 
-// There should never be more than
-// one instance of `FastDom` in an app
-var exports = win.fastdom = (win.fastdom || new FastDom()); // jshint ignore:line
+win.fastdom = new FastDom();
 
-// Expose to CJS & AMD
-if ((typeof define)[0] == 'f') define(function() { return exports; });
-else if ((typeof module)[0] == 'o') module.exports = exports;
-
-})( typeof window !== 'undefined' ? window : this);
+})(window);
