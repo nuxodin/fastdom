@@ -14,23 +14,11 @@
 'use strict';
 
 /**
- * Mini logger
- *
- * @return {Function}
- */
-var debug = 0 ? console.log.bind(console, '[fastdom]') : function() {};
-
-/**
  * Normalized rAF
  *
  * @type {Function}
  */
-var raf = win.requestAnimationFrame
-  || win.webkitRequestAnimationFrame
-  || win.mozRequestAnimationFrame
-  || win.msRequestAnimationFrame
-  || function(cb) { return setTimeout(cb, 16); };
-
+var raf = win.requestAnimationFrame;
 /**
  * Initialize a `FastDom`.
  *
@@ -41,7 +29,6 @@ function FastDom() {
   self.reads = [];
   self.writes = [];
   self.raf = raf.bind(win); // test hook
-  debug('initialized', self);
 }
 
 FastDom.prototype = {
@@ -55,7 +42,6 @@ FastDom.prototype = {
    * @public
    */
   measure: function(fn, ctx) {
-    debug('measure');
     var task = !ctx ? fn : fn.bind(ctx);
     this.reads.push(task);
     scheduleFlush(this);
@@ -71,7 +57,6 @@ FastDom.prototype = {
    * @public
    */
   mutate: function(fn, ctx) {
-    debug('mutate');
     var task = !ctx ? fn : fn.bind(ctx);
     this.writes.push(task);
     scheduleFlush(this);
@@ -86,56 +71,7 @@ FastDom.prototype = {
    * @public
    */
   clear: function(task) {
-    debug('clear', task);
     return remove(this.reads, task) || remove(this.writes, task);
-  },
-
-  /**
-   * Extend this FastDom with some
-   * custom functionality.
-   *
-   * Because fastdom must *always* be a
-   * singleton, we're actually extending
-   * the fastdom instance. This means tasks
-   * scheduled by an extension still enter
-   * fastdom's global task queue.
-   *
-   * The 'super' instance can be accessed
-   * from `this.fastdom`.
-   *
-   * @example
-   *
-   * var myFastdom = fastdom.extend({
-   *   initialize: function() {
-   *     // runs on creation
-   *   },
-   *
-   *   // override a method
-   *   measure: function(fn) {
-   *     // do extra stuff ...
-   *
-   *     // then call the original
-   *     return this.fastdom.measure(fn);
-   *   },
-   *
-   *   ...
-   * });
-   *
-   * @param  {Object} props  properties to mixin
-   * @return {FastDom}
-   */
-  extend: function(props) {
-    debug('extend', props);
-    if (typeof props != 'object') throw new Error('expected object');
-
-    var child = Object.create(this);
-    mixin(child, props);
-    child.fastdom = this;
-
-    // run optional creation hook
-    if (child.initialize) child.initialize();
-
-    return child;
   },
 
   // override this with a function
@@ -154,7 +90,6 @@ function scheduleFlush(fastdom) {
   if (!fastdom.scheduled) {
     fastdom.scheduled = true;
     fastdom.raf(flush.bind(null, fastdom));
-    debug('flush scheduled');
   }
 }
 
@@ -168,16 +103,12 @@ function scheduleFlush(fastdom) {
  * @private
  */
 function flush(fastdom) {
-  debug('flush');
-
   var writes = fastdom.writes;
   var reads = fastdom.reads;
   var error;
 
   try {
-    debug('flushing reads', reads.length);
     runTasks(reads);
-    debug('flushing writes', writes.length);
     runTasks(writes);
   } catch (e) { error = e; }
 
@@ -187,7 +118,6 @@ function flush(fastdom) {
   if (reads.length || writes.length) scheduleFlush(fastdom);
 
   if (error) {
-    debug('task errored', error.message);
     if (fastdom.catch) fastdom.catch(error);
     else throw error;
   }
@@ -202,7 +132,6 @@ function flush(fastdom) {
  * @private
  */
 function runTasks(tasks) {
-  debug('run tasks');
   var task; while (task = tasks.shift()) task();
 }
 
