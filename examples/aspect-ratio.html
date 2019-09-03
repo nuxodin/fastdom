@@ -49,7 +49,7 @@ handleWriteStack = function(){
 
 readStack = [];
 read = function(callback){
-	if (!readStack.length) requestPostAnimationFrame(handleReadStack);
+	if (!readStack.length) setTimeout(handleReadStack,0);
 	readStack.push(callback);
 }
 handleReadStack = function(){
