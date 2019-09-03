@@ -40,6 +40,7 @@ if (!window.requestPostAnimationFrame) {
 
 writeStack = [];
 write = function(callback){
+	console.log(write)
 	if (!writeStack.length) requestAnimationFrame(handleWriteStack);
 	writeStack.push(callback);
 }
