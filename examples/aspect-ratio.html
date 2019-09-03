@@ -49,7 +49,7 @@ handleWriteStack = function(){
 
 readStack = [];
 read = function(callback){
-	if (!readStack.length) setTimeout(handleReadStack,0);
+	if (!readStack.length) queueMicrotask(handleReadStack);
 	readStack.push(callback);
 }
 handleReadStack = function(){
