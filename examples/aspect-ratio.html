@@ -25,42 +25,8 @@
   <button id="resetbtn">reset</button>
   <section id="perf"></section>
   <section id="container"></section>
-  <xscript src="../fastdom.js"></xscript>
+  <script src="../fastdom.js"></script>
   <script>
-
-fastdom = {};
-   
-if (!window.requestPostAnimationFrame) {
-	window.requestPostAnimationFrame = function(callback){
-		requestAnimationFrame(function(){
-			setTimeout(callback)
-		})
-	}
-}
-
-writeStack = [];
-write = function(callback){
-	if (!writeStack.length) requestAnimationFrame(handleWriteStack);
-	writeStack.push(callback);
-}
-handleWriteStack = function(){
-	while (writeStack.length) writeStack.pop()();
-}
-
-readStack = [];
-read = function(callback){
-	if (!readStack.length) queueMicrotask(handleReadStack);
-	readStack.push(callback);
-}
-handleReadStack = function(){
-	while (readStack.length) readStack.pop()();
-}   
-
-fastdom.mutate = write;
-fastdom.measure = read;   
-   
-   
-   
    
     var n;
     var start;
