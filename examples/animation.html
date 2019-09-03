@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>FastDom: Animation Example</title>
-		<script type="text/javascript" src="../fastdom.min.js"></script>
+		<xscript type="text/javascript" src="../fastdom.min.js"></xscript>
 	</head>
 	<body>
 
@@ -39,7 +39,39 @@
 		<div id='test'></div>
 
 		<script>
+fastdom = {};
+   
+if (!window.requestPostAnimationFrame) {
+	window.requestPostAnimationFrame = function(callback){
+		requestAnimationFrame(function(){
+			setTimeout(callback)
+		})
+	}
+}
 
+writeStack = [];
+write = function(callback){
+	if (!writeStack.length) requestAnimationFrame(handleWriteStack);
+	writeStack.push(callback);
+}
+handleWriteStack = function(){
+	while (writeStack.length) writeStack.pop()();
+}
+
+readStack = [];
+read = function(callback){
+	if (!readStack.length) queueMicrotask(handleReadStack);
+	readStack.push(callback);
+}
+handleReadStack = function(){
+	while (readStack.length) readStack.pop()();
+}   
+
+fastdom.mutate = write;
+fastdom.measure = read;   
+			
+			
+			
 			var moveMethod = 'sync',
 				count      = document.getElementById('count'),
 				test       = document.getElementById('test'),
